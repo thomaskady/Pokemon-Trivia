@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Pokemon</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="styles.css" />
+        <script src="app.js" defer></script>
+    </head>
+    <body>
+        <div class="text-container">
+            <p class="animate invisible" id="text__1">
+                Welcome, trainer! We have created this simulated environment to
+                teach you about type advantages and Pokemon species before you
+                embark on your own journey. There are hundreds of species to
+                memorize, with a wide variety of typings and traits to
+                understand.
+            </p>
+            <p class="hidden animate invisible" id="text__2">
+                To catch more Pokemon, you must fulfill two requirements. First,
+                you must send out a Pokemon that has a type advantage over the
+                wild Pokemon. Second, you must be able to identify the Pokemon
+                species. Unfortunately your Pokedex can only provide a scrambled
+                version of the species name until you capture it. Correctly
+                unscramble the name to complete the capture. Once you have
+                captured the Pokemon, it will be stored in your PC and you may
+                use it in future battles.
+            </p>
+            <p class="hidden animate invisible" id="text__3">
+                To begin, I have provided you with 3 of your very own Pokemon.
+                Below, you will find the Grass Pokemon BULBASAUR, the Fire
+                Pokemon CHARMANDER, and the Water Pokemon SQUIRTLE. If you
+                forget their typings, you can always check your Pokedex.
+            </p>
+            <p class="hidden animate invisible" id="text__4">
+                It's time for you to encounter your first Pokemon. You will find
+                that some species are more common than others, so don't get
+                discouraged if it takes some time to complete your Pokedex.
+                Whenever you're ready, click "Next Encounter" below.
+            </p>
+            <button id="next">Next</button>
+        </div>
+
+        <button>Next Encounter</button>
+
+        <div id="arena">
+            <div id="wild-pokemon"></div>
+            <div id="user-pokemon"></div>
+
+        </div>
+
+        <div class="text-container animate" id="arena-text">
+            <p>You have encountered</p>
+        </div>
+
+        <div id="pokemon-selection">
+            <button id="pokemon1">
+                <img
+                    src="assets/1.png"
+                    alt="Grass Pokemon Bulbasaur"
+                />BULBASAUR
+            </button>
+            <button id="pokemon2">
+                <img
+                    src="assets/4.png"
+                    alt="Fire Pokemon Charmander"
+                />CHARMANDER
+            </button>
+            <button id="pokemon3">
+                <img src="assets/7.png" alt="Water Pokemon Squirtle" />SQUIRTLE
+            </button>
+        </div>
+
+        <div id="bank"></div>
+    </body>
+</html>
