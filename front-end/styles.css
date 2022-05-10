@@ -1,6 +1,6 @@
 body {
     font-family: 'Press Start 2P';
-    margin: 24px;
+    margin: 12px 184px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -62,4 +62,23 @@ body {
 #arena-text {
     box-sizing: border-box;
     width: 964px;
+}
+
+#wild-pokemon img {
+    height: 250px;
+    width: auto;
+    position: relative;
+    top: 60px;
+    left: 80px;
+    animation: slide-in 2000ms;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(70%);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
 }

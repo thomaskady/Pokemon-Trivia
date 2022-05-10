@@ -59,6 +59,7 @@ class AnimatedText {
     nextTextBtnHandler() {
         if (parseInt(this.id) === 4) {
             this.completeAnimation();
+            this.button.remove();
             return;
         }
         if (this.timer === null) {
@@ -82,6 +83,10 @@ class CommonPokemon {
 }
 
 class Encounter {
+    constructor() {
+        const encounterButton = document.getElementById('encounter-btn');
+        encounterButton.addEventListener('click', this.encounterButtonHandler.bind(this));
+    }
 
     generatePokemon() {
         this.dexNum = Math.floor(Math.random() * 151);
@@ -90,19 +95,23 @@ class Encounter {
 
     render() {
         const wildPokemonField = document.getElementById('wild-pokemon');
-        const wildPokemonImg = document.createElement('img');
+        this.wildPokemonImg = document.createElement('img');
         this.generatePokemon();
-        wildPokemonImg.src = `assets/${this.dexNum}.png`
-        wildPokemonField.appendChild(wildPokemonImg);
+        this.wildPokemonImg.src = `assets/${this.dexNum}.png`
+        wildPokemonField.appendChild(this.wildPokemonImg);
+    }
+
+    encounterButtonHandler() {
+       if (this.wildPokemonImg) {
+           this.wildPokemonImg.remove();
+       }
+       this.render(); 
     }
 }
 
 let animation = new AnimatedText(1);
 
-console.log(animation);
-
 animation.animateText();
 
 let encounter = new Encounter();
 
-encounter.render();
