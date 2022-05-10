@@ -8,7 +8,10 @@ class AnimatedText {
         this.button = document.createElement('button');
         this.button.textContent = 'Next';
         parentDiv.appendChild(this.button);
-        this.button.addEventListener('click', this.nextTextBtnHandler.bind(this));
+        this.button.addEventListener(
+            'click',
+            this.nextTextBtnHandler.bind(this)
+        );
     }
 
     becomeVisible(hiddenContent) {
@@ -30,14 +33,14 @@ class AnimatedText {
     }
 
     showNextText(elementId) {
-        let idNumber = parseInt(elementId);        
+        let idNumber = parseInt(elementId);
         this.text.textContent = '';
         let nextText = new AnimatedText(`${idNumber + 1}`);
         console.log(nextText);
         nextText.animateText();
     }
 
-    animateText() {    
+    animateText() {
         this.hiddenLetters = this.hidden.map((letter) => {
             const span = document.createElement('span');
             span.textContent = `${letter}`;
@@ -46,12 +49,12 @@ class AnimatedText {
         });
 
         console.log(this.hiddenLetters);
-    
+
         this.text.classList.remove('invisible');
         this.text.classList.remove('hidden');
-    
+
         this.becomeVisible(this.hiddenLetters);
-    };
+    }
 
     nextTextBtnHandler() {
         if (parseInt(this.id) === 4) {
@@ -68,11 +71,38 @@ class AnimatedText {
     }
 }
 
+class CommonPokemon {
+    constructor(dexNum, imgURL, species, type, stage) {
+        this.dexNum = dexNum;
+        this.imgURL = imgURL;
+        this.species = species;
+        this.type = type;
+        this.stage = stage;
+    }
+}
 
+class Encounter {
 
-let animation = new AnimatedText(1); 
+    generatePokemon() {
+        this.dexNum = Math.floor(Math.random() * 151);
+        const pokemon = new CommonPokemon (this.dexNum, this.dexNum);
+    }
 
-console.log(animation)
+    render() {
+        const wildPokemonField = document.getElementById('wild-pokemon');
+        const wildPokemonImg = document.createElement('img');
+        this.generatePokemon();
+        wildPokemonImg.src = `assets/${this.dexNum}.png`
+        wildPokemonField.appendChild(wildPokemonImg);
+    }
+}
+
+let animation = new AnimatedText(1);
+
+console.log(animation);
 
 animation.animateText();
 
+let encounter = new Encounter();
+
+encounter.render();
