@@ -36,7 +36,6 @@ class AnimatedText {
         let idNumber = parseInt(elementId);
         this.text.textContent = '';
         let nextText = new AnimatedText(`${idNumber + 1}`);
-        console.log(nextText);
         nextText.animateText();
     }
 
@@ -47,8 +46,6 @@ class AnimatedText {
             this.text.appendChild(span);
             return span;
         });
-
-        console.log(this.hiddenLetters);
 
         this.text.classList.remove('invisible');
         this.text.classList.remove('hidden');
@@ -72,46 +69,117 @@ class AnimatedText {
     }
 }
 
-class CommonPokemon {
-    constructor(dexNum, imgURL, species, type, stage) {
-        this.dexNum = dexNum;
-        this.imgURL = imgURL;
-        this.species = species;
-        this.type = type;
-        this.stage = stage;
-    }
-}
-
 class Encounter {
-    constructor() {
+    constructor(pokedex) {
+        this.pokedex = pokedex;
         const encounterButton = document.getElementById('encounter-btn');
-        encounterButton.addEventListener('click', this.encounterButtonHandler.bind(this));
+        encounterButton.addEventListener(
+            'click',
+            this.encounterButtonHandler.bind(this)
+        );
     }
 
-    generatePokemon() {
-        this.dexNum = Math.floor(Math.random() * 151);
-        const pokemon = new CommonPokemon (this.dexNum, this.dexNum);
+    generateRandomPokemon() {
+        const dexNum = Math.floor(Math.random() * 150);
+        const pokemon = this.pokedex[dexNum];
+        console.log(pokemon);
+        return pokemon;
     }
 
     render() {
+        let pokemon = this.generateRandomPokemon();
+        console.log(pokemon);
+        console.log(pokemon.imgURL);
         const wildPokemonField = document.getElementById('wild-pokemon');
         this.wildPokemonImg = document.createElement('img');
-        this.generatePokemon();
-        this.wildPokemonImg.src = `assets/${this.dexNum}.png`
+        this.wildPokemonImg.src = pokemon.imgURL;
         wildPokemonField.appendChild(this.wildPokemonImg);
     }
 
     encounterButtonHandler() {
-       if (this.wildPokemonImg) {
-           this.wildPokemonImg.remove();
-       }
-       this.render(); 
+        if (this.wildPokemonImg) {
+            this.wildPokemonImg.remove();
+        }
+        this.render();
     }
 }
 
-let animation = new AnimatedText(1);
+class PlayerSelection {
+    pokemon = [];
 
-animation.animateText();
+    constructor(pokedex) {
+        this.pokedex = pokedex;
+    }
 
-let encounter = new Encounter();
+    formStartParty() {
+        const BULBASAUR = this.pokedex[0];
+        const CHARMANDER = this.pokedex[3];
+        const SQUIRTLE = this.pokedex[6];
+        this.pokemon.push(BULBASAUR);
+        this.pokemon.push(CHARMANDER);
+        this.pokemon.push(SQUIRTLE);
+    }
 
+    render() {
+        this.formStartParty();
+        const parentDiv = document.getElementById('pokemon-selection');
+        const buttons = parentDiv.querySelectorAll('button');
+        for (let i = 0; i < buttons.length; i++) {
+            let userPokemonImg = document.createElement('img');
+            userPokemonImg.src = this.pokemon[i].imgURL;
+            buttons[i].textContent = this.pokemon[i].name.toUpperCase();
+            buttons[i].appendChild(userPokemonImg);
+        }
+    }
+}
+
+
+class Entry {
+    constructor(id, name, imgURL, type) {
+        this.id = id;
+        this.name = name;
+        this.imgURL = imgURL;
+        this.type = type;
+    }
+}
+
+class Pokedex {
+    static async createEntries(type, search) {
+        Pokedex.entries = [];
+        for (let i = 1; i <= 151; i++) {
+            const data = await Pokedex.fetchData(type, i);
+            let entry = new Entry(
+                data.id,
+                data.name,
+                data.sprites.front_default,
+                data.types
+            );
+            Pokedex.entries.push(entry);
+        }
+        console.log(Pokedex.entries);
+        return Pokedex.entries;
+    }
+
+    static async fetchData(type, search) {
+        const res = await fetch(`https://pokeapi.co/api/v2/${type}/${search}`);
+        const data = await res.json();
+        return data;
+    }
+}
+
+class App {
+    static async init() {
+        let pokedex = await Pokedex.createEntries('pokemon');
+        let encounter = new Encounter(pokedex);
+        let starters = new PlayerSelection(pokedex);
+        starters.render();
+    }
+
+    static renderText() {
+        let animation = new AnimatedText(1);
+        animation.animateText();
+    }
+}
+
+App.init();
+App.renderText();
