@@ -12,6 +12,11 @@
             rel="stylesheet"
         />
         <link rel="stylesheet" href="styles.css" />
+        <script src="https://unpkg.com/pokeapi-js-wrapper/dist/index.js"></script>
+        <script>
+            const P = new Pokedex.Pokedex({ cacheImages: true });
+            console.log(P);
+          </script>
         <script src="app.js" defer></script>
     </head>
     <body>
@@ -34,14 +39,24 @@
                 use it in future battles.
             </p>
             <p class="hidden animate invisible" id="text__3">
-                To begin, I have provided you with 3 of your very own Pokemon.
-                Below, you will find the Grass Pokemon BULBASAUR, the Fire
-                Pokemon CHARMANDER, and the Water Pokemon SQUIRTLE. If you
-                forget their typings, you can always check your Pokedex.
+                To begin, I have provided you with 3 of your very own
+                representative Pokemon. Below, you will find the Grass Pokemon
+                BULBASAUR, the Fire Pokemon CHARMANDER, and the Water Pokemon
+                SQUIRTLE. If you forget their typings, you can always check your
+                Pokedex.
             </p>
             <p class="hidden animate invisible" id="text__4">
-                It's time for you to encounter some Pokemon. You will find
-                that some species are more common than others, so don't get
+                These Pokemon will not provide the type coverage you need for
+                every encounter. Part of being a good trainer is knowing what
+                fights you can take. If you do not have a Pokemon representative
+                available to you that can inflict a super effective attack, you
+                will have to flee. As you capture more Pokemon, you will be able
+                to inflict more super effective attacks and capture more
+                Pokemon.
+            </p>
+            <p class="hidden animate invisible" id="text__5">
+                It's time for you to encounter some Pokemon. You will find that
+                some species are more common than others, so don't get
                 discouraged if it takes some time to complete your Pokedex.
                 Whenever you're ready, click "Next Encounter" below.
             </p>
@@ -52,23 +67,19 @@
         <div id="arena">
             <div id="user-pokemon"></div>
             <div id="wild-pokemon"></div>
-
         </div>
 
         <div class="text-container animate" id="arena-text">
-            <p>You have encountered a new Pokemon. Select a Pokemon with a type advantage to battle it.</p>
+            <p>
+                You have encountered a new Pokemon. Select a Pokemon with a type
+                advantage to battle it.
+            </p>
         </div>
 
         <div id="pokemon-selection">
-            <button id="pokemon__1">
-
-            </button>
-            <button id="pokemon__2">
-
-            </button>
-            <button id="pokemon__3">
-                
-            </button>
+            <button id="grass"></button>
+            <button id="fire"></button>
+            <button id="water"></button>
         </div>
 
         <div id="bank"></div>
