@@ -11,7 +11,7 @@ String.prototype.shuffle = function () {
     return string.join('');
 };
 
-let zubat = 'thomas';
+let zubat = 'zubat';
 zubat.shuffle();
 
 class AnimatedText {
@@ -112,9 +112,8 @@ class Encounter {
     }
 
     generateRandomPokemon() {
-        const dexNum = Math.floor(Math.random() * 150);
+        const dexNum = Math.floor(Math.random() * 151);
         const pokemon = this.pokedex[dexNum];
-        console.log(pokemon);
         return pokemon;
     }
 
@@ -134,18 +133,18 @@ class Encounter {
         this.pokemon = this.generateRandomPokemon();
         this.render();
         this.getWildPokemonType();
-        console.log(this.type);
+        let battle = new Battle(this);
     }
 }
 
 class PlayerSelection {
-    pokemon = [];
-
-    constructor(pokedex) {
+    constructor(pokedex, types) {
         this.pokedex = pokedex;
-        const parentDiv = document.getElementById('pokemon-selection');
-        this.buttons = parentDiv.querySelectorAll('button');
-        console.log(this.buttons[0].id);
+        this.party = new Map();
+        for (const type of types.keys()) {
+            this.party.set(`${type}`, null);
+        }
+        this.formStartParty();
         let encounter = new Encounter(this.pokedex);
     }
 
@@ -153,31 +152,37 @@ class PlayerSelection {
         const BULBASAUR = this.pokedex[0];
         const CHARMANDER = this.pokedex[3];
         const SQUIRTLE = this.pokedex[6];
-        this.grass = BULBASAUR;
-        this.fire = CHARMANDER;
-        this.water = SQUIRTLE;
-        this.pokemon.push(this.grass);
-        this.pokemon.push(this.fire);
-        this.pokemon.push(this.water);
+        this.party.set('grass', BULBASAUR);
+        this.party.set('fire', CHARMANDER);
+        this.party.set('water', SQUIRTLE);
+        console.log(this.party);
     }
 
     renderButtons() {
-        this.formStartParty();
         const parentDiv = document.getElementById('pokemon-selection');
-        const buttons = parentDiv.querySelectorAll('button');
-        for (let i = 0; i < buttons.length; i++) {
-            let userPokemonImg = document.createElement('img');
-            userPokemonImg.src = this.pokemon[i].imgURL;
-            buttons[i].textContent = this.pokemon[i].name.toUpperCase();
-            buttons[i].appendChild(userPokemonImg);
+        for (const [type, member] of this.party.entries()) {
+            if (member) {
+                let button = document.createElement('button');
+                button.id = type;
+                button.textContent = member.name.toUpperCase();
+                let buttonImg = document.createElement('img');
+                buttonImg.src = member.imgURL;
+                parentDiv.appendChild(button);
+                button.appendChild(buttonImg);               
+            }
         }
     }
 }
 
 class Battle {
-    constructor(pokedex) {
-        this.pokedex = pokedex;
+    constructor(encounter) {
+        this.opponentType = encounter.type;
+        this.playerType;
+        console.log(this.opponentType);
     }
+
+    
+
 }
 
 class Entry {
@@ -191,13 +196,16 @@ class Entry {
 
 class Pokedex {
     static async fetchTypes() {
-        Pokedex.types = [];
+        Pokedex.types = new Map();
         const data = await P.getTypesList();
         for (let i = 0; i <= 17; i++) {
-        Pokedex.types.push(data.results[i].name);
+            const res = await fetch(data.results[i].url);
+            const typeInfo = await res.json();
+            Pokedex.types.set(data.results[i].name, typeInfo.damage_relations)
         }
         return Pokedex.types;
     }
+
 
     static async createEntries() {
         Pokedex.entries = [];
@@ -214,14 +222,14 @@ class Pokedex {
         console.log(Pokedex.entries);
         return Pokedex.entries;
     }
-
 }
 
 class App {
     static async init() {
         let pokedex = await Pokedex.createEntries();
         let types = await Pokedex.fetchTypes();
-        let starters = new PlayerSelection(pokedex);
+        console.log(types);
+        let starters = new PlayerSelection(pokedex, types);
         starters.renderButtons();
     }
 
@@ -233,3 +241,5 @@ class App {
 
 App.init();
 App.renderText();
+
+
