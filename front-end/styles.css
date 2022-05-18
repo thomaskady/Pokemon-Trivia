@@ -1,0 +1,84 @@
+body {
+    font-family: 'Press Start 2P';
+    margin: 12px 184px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.text-container {
+    background-color: rgb(202, 202, 202);
+    padding: 1em;
+    border: 4px black;
+    border-style: double;
+    border-radius: 8px;
+}
+
+.text-container p {
+    font-size: 18px;
+    margin-top: 0;
+    line-height: 1.3em;
+}
+
+.text-container button {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.invisible, span {
+    visibility: hidden;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.hidden {
+    display: none;
+}
+
+#arena {
+    background-image: url(assets/battlebackground.png);
+    border: 4px black;
+    border-style: solid;
+    border-radius: 4px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 956px;
+    height: 448px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#wild-pokemon {
+    background-color: rgba(240, 248, 255, 0.226);
+    min-height: 100%;
+}
+
+#user-pokemon {
+    background-color: rgba(18, 143, 252, 0.247);
+}
+
+#arena-text {
+    box-sizing: border-box;
+    width: 964px;
+}
+
+#wild-pokemon img {
+    height: 250px;
+    width: auto;
+    position: relative;
+    top: 60px;
+    left: 80px;
+    animation: slide-in 2000ms;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(75%);
+    }
+
+    to {
+        transform: translateX(0%);
+    }
+}
