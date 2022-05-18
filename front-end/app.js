@@ -86,7 +86,8 @@ class AnimatedText {
 }
 
 class Encounter {
-    constructor(pokedex) {
+    constructor(pokedex, playerParty) {
+        this.playerParty = playerParty;
         this.pokedex = pokedex;
         const encounterButton = document.getElementById('encounter-btn');
         encounterButton.addEventListener(
@@ -133,7 +134,7 @@ class Encounter {
         this.pokemon = this.generateRandomPokemon();
         this.render();
         this.getWildPokemonType();
-        let battle = new Battle(this);
+        let battle = new Battle(this, this.playerParty);
     }
 }
 
@@ -145,7 +146,7 @@ class PlayerSelection {
             this.party.set(`${type}`, null);
         }
         this.formStartParty();
-        let encounter = new Encounter(this.pokedex);
+        let encounter = new Encounter(this.pokedex, this.party);
     }
 
     formStartParty() {
@@ -160,6 +161,7 @@ class PlayerSelection {
 
     renderButtons() {
         const parentDiv = document.getElementById('pokemon-selection');
+        parentDiv.innerHTML = '';
         for (const [type, member] of this.party.entries()) {
             if (member) {
                 let button = document.createElement('button');
@@ -175,13 +177,33 @@ class PlayerSelection {
 }
 
 class Battle {
-    constructor(encounter) {
+    constructor(encounter, playerParty) {
+        console.log(playerParty);
         this.opponentType = encounter.type;
         this.playerType;
         console.log(this.opponentType);
+        this.buttons = this.getButtonNodeList();
+        console.log(this.buttons);
+        let button1 = this.buttons[0];
+        button1.addEventListener('click', this.clickHandler.bind(this));
     }
 
-    
+    getButtonNodeList() {
+        const parentDiv = document.getElementById('pokemon-selection');
+        const buttons = parentDiv.querySelectorAll('button');
+        return buttons;
+    }
+
+    getButtonId() {
+        let id = this.buttons[0].id;
+        console.log(id);
+        return id;
+    }
+
+    clickHandler(button) {
+        let id = this.getButtonId();
+        console.log(id);
+    }
 
 }
 
