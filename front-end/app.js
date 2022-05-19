@@ -182,25 +182,16 @@ class Battle {
         this.opponentType = encounter.type;
         this.playerType;
         console.log(this.opponentType);
-        this.buttons = this.getButtonNodeList();
-        for (const button of this.buttons) {
-            button.addEventListener(
-                'click',
-                this.clickHandler.bind(this, button)
-            );
-        }
-    }
-
-    getButtonNodeList() {
         const parentDiv = document.getElementById('pokemon-selection');
-        const buttons = parentDiv.querySelectorAll('button');
-        return buttons;
+        parentDiv.addEventListener('click', event => {
+            console.log(event);
+            if (event.target.tagName === 'BUTTON' || event.target.tagName === 'IMG') {
+                const id = event.target.closest('button').id;
+                this.clickHandler(id);
+            }
+        })
     }
 
-    getButtonId(button) {
-        let id = button.id;
-        return id;
-    }
 
     getPlayerType(pokemon, id) {
         this.pokemonObj = pokemon.get(id);
@@ -226,8 +217,7 @@ class Battle {
         parentDiv.appendChild(img);
     }
 
-    clickHandler(button) {
-        let id = this.getButtonId(button);
+    clickHandler(id) {
         let type = this.getPlayerType(this.playerParty, id);
         this.renderPlayerPokemon();
     }
