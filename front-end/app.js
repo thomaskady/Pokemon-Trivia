@@ -170,7 +170,7 @@ class PlayerSelection {
                 let buttonImg = document.createElement('img');
                 buttonImg.src = member.imgURL;
                 parentDiv.appendChild(button);
-                button.appendChild(buttonImg);               
+                button.appendChild(buttonImg);
             }
         }
     }
@@ -178,14 +178,17 @@ class PlayerSelection {
 
 class Battle {
     constructor(encounter, playerParty) {
-        console.log(playerParty);
+        this.playerParty = playerParty;
         this.opponentType = encounter.type;
         this.playerType;
         console.log(this.opponentType);
         this.buttons = this.getButtonNodeList();
-        console.log(this.buttons);
-        let button1 = this.buttons[0];
-        button1.addEventListener('click', this.clickHandler.bind(this));
+        for (const button of this.buttons) {
+            button.addEventListener(
+                'click',
+                this.clickHandler.bind(this, button)
+            );
+        }
     }
 
     getButtonNodeList() {
@@ -194,17 +197,40 @@ class Battle {
         return buttons;
     }
 
-    getButtonId() {
-        let id = this.buttons[0].id;
-        console.log(id);
+    getButtonId(button) {
+        let id = button.id;
         return id;
     }
 
-    clickHandler(button) {
-        let id = this.getButtonId();
-        console.log(id);
+    getPlayerType(pokemon, id) {
+        this.pokemonObj = pokemon.get(id);
+        let typeArray = this.pokemonObj.type;
+        let type;
+        if (typeArray.length === 1) {
+            type = { type1: typeArray[0].type.name, type2: null };
+        } else if (typeArray.length === 2) {
+            type = {
+                type1: typeArray[0].type.name,
+                type2: typeArray[1].type.name,
+            };
+        }
+        console.log(type);
+        return type;
     }
 
+    renderPlayerPokemon() {
+        const parentDiv = document.getElementById('user-pokemon');
+        parentDiv.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = this.pokemonObj.imgURL;
+        parentDiv.appendChild(img);
+    }
+
+    clickHandler(button) {
+        let id = this.getButtonId(button);
+        let type = this.getPlayerType(this.playerParty, id);
+        this.renderPlayerPokemon();
+    }
 }
 
 class Entry {
@@ -216,6 +242,35 @@ class Entry {
     }
 }
 
+class TypeChart {
+    static create(_types) {
+        let chart = new Map();
+        let types = _types;
+        for (const [key, value] of types.entries()) {
+            let doubleDamage = value.double_damage_to;
+            let halfDamage = value.half_damage_to;
+            let noDamage = value.no_damage_to;
+            doubleDamage = TypeChart.setDamageInfo(doubleDamage, 2.0);
+            halfDamage = TypeChart.setDamageInfo(halfDamage, 0.5);
+            noDamage = TypeChart.setDamageInfo(noDamage, 0);
+            const damage = { ...doubleDamage, ...halfDamage, ...noDamage };
+            chart.set(key, { defending: damage });
+        }
+        return chart;
+    }
+
+    static setDamageInfo(damage, multiplier) {
+        if (damage) {
+            const defending = {};
+            for (const obj of damage) {
+                const name = obj.name;
+                defending[name] = multiplier;
+            }
+            return defending;
+        }
+    }
+}
+
 class Pokedex {
     static async fetchTypes() {
         Pokedex.types = new Map();
@@ -223,11 +278,10 @@ class Pokedex {
         for (let i = 0; i <= 17; i++) {
             const res = await fetch(data.results[i].url);
             const typeInfo = await res.json();
-            Pokedex.types.set(data.results[i].name, typeInfo.damage_relations)
+            Pokedex.types.set(data.results[i].name, typeInfo.damage_relations);
         }
         return Pokedex.types;
     }
-
 
     static async createEntries() {
         Pokedex.entries = [];
@@ -248,20 +302,20 @@ class Pokedex {
 
 class App {
     static async init() {
-        let pokedex = await Pokedex.createEntries();
-        let types = await Pokedex.fetchTypes();
+        const pokedex = await Pokedex.createEntries();
+        const types = await Pokedex.fetchTypes();
+        const chart = TypeChart.create(types);
         console.log(types);
-        let starters = new PlayerSelection(pokedex, types);
+        console.log(chart.get('water').defending.grass);
+        const starters = new PlayerSelection(pokedex, types);
         starters.renderButtons();
     }
 
     static renderText() {
-        let animation = new AnimatedText(1);
+        const animation = new AnimatedText(1);
         animation.animateText();
     }
 }
 
 App.init();
 App.renderText();
-
-
