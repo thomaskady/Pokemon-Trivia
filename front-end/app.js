@@ -86,9 +86,10 @@ class AnimatedText {
 }
 
 class Encounter {
-    constructor(pokedex, playerParty) {
+    constructor(pokedex, playerParty, chart) {
         this.playerParty = playerParty;
         this.pokedex = pokedex;
+        this.chart = chart;
         const encounterButton = document.getElementById('encounter-btn');
         encounterButton.addEventListener(
             'click',
@@ -96,20 +97,19 @@ class Encounter {
         );
     }
 
-    getWildPokemonType() {
-        let type_1 = this.pokemon.type[0].type.name;
-        let type_2;
-        if (this.pokemon.type[1]) {
-            type_2 = this.pokemon.type[1].type.name;
-        }
+    getWildPokemonType(wildPokemon) {
+        let typeArray = wildPokemon.type;
         let type;
-        if (type_1 && type_2) {
-            type = `${type_1}/${type_2}`;
-        } else {
-            type = type_1;
+        if (typeArray.length === 1) {
+            type = { type1: typeArray[0].type.name, type2: null };
+        } else if (typeArray.length === 2) {
+            type = {
+                type1: typeArray[0].type.name,
+                type2: typeArray[1].type.name,
+            };
         }
-        this.type = type;
-        return this.type;
+        console.log(type);
+        return type;
     }
 
     generateRandomPokemon() {
@@ -118,12 +118,12 @@ class Encounter {
         return pokemon;
     }
 
-    render() {
-        console.log(this.pokemon);
-        console.log(this.pokemon.imgURL);
+    render(wildPokemon) {
+        console.log(wildPokemon);
+        console.log(wildPokemon.imgURL);
         const wildPokemonField = document.getElementById('wild-pokemon');
         this.wildPokemonImg = document.createElement('img');
-        this.wildPokemonImg.src = this.pokemon.imgURL;
+        this.wildPokemonImg.src = wildPokemon.imgURL;
         wildPokemonField.appendChild(this.wildPokemonImg);
     }
 
@@ -131,22 +131,22 @@ class Encounter {
         if (this.wildPokemonImg) {
             this.wildPokemonImg.remove();
         }
-        this.pokemon = this.generateRandomPokemon();
-        this.render();
-        this.getWildPokemonType();
-        let battle = new Battle(this, this.playerParty);
+        const wildPokemon = this.generateRandomPokemon();
+        this.render(wildPokemon);
+        const type = this.getWildPokemonType(wildPokemon);
+        let battle = new Battle(type, this.playerParty, this.chart);
     }
 }
 
 class PlayerSelection {
-    constructor(pokedex, types) {
+    constructor(pokedex, types, chart) {
         this.pokedex = pokedex;
         this.party = new Map();
         for (const type of types.keys()) {
             this.party.set(`${type}`, null);
         }
         this.formStartParty();
-        let encounter = new Encounter(this.pokedex, this.party);
+        let encounter = new Encounter(this.pokedex, this.party, chart);
     }
 
     formStartParty() {
@@ -177,21 +177,22 @@ class PlayerSelection {
 }
 
 class Battle {
-    constructor(encounter, playerParty) {
+    constructor(type, playerParty, chart) {
         this.playerParty = playerParty;
-        this.opponentType = encounter.type;
-        this.playerType;
+        this.opponentType = type;
+        this.typeChart = chart;
+        console.log(this.typeChart);
         console.log(this.opponentType);
-        const parentDiv = document.getElementById('pokemon-selection');
-        parentDiv.addEventListener('click', event => {
-            console.log(event);
+        const oldParentDiv = document.getElementById('pokemon-selection');
+        const newParentDiv = oldParentDiv.cloneNode(true);
+        oldParentDiv.replaceWith(newParentDiv);
+        newParentDiv.addEventListener('click', event => {
             if (event.target.tagName === 'BUTTON' || event.target.tagName === 'IMG') {
                 const id = event.target.closest('button').id;
                 this.clickHandler(id);
             }
         })
     }
-
 
     getPlayerType(pokemon, id) {
         this.pokemonObj = pokemon.get(id);
@@ -209,6 +210,16 @@ class Battle {
         return type;
     }
 
+    battleResult(playerType, opponentType, chart) {
+        const attacking = playerType;
+        const defending = opponentType;
+        const typeChart = chart;
+        if (!attacking.type2) {
+            const result = typeChart.get(attacking.type1).defending[`${defending.type1}`];
+            console.log(result);
+        }
+    }
+
     renderPlayerPokemon() {
         const parentDiv = document.getElementById('user-pokemon');
         parentDiv.innerHTML = '';
@@ -220,6 +231,8 @@ class Battle {
     clickHandler(id) {
         let type = this.getPlayerType(this.playerParty, id);
         this.renderPlayerPokemon();
+        this.battleResult(type, this.opponentType, this.typeChart);
+
     }
 }
 
@@ -295,9 +308,7 @@ class App {
         const pokedex = await Pokedex.createEntries();
         const types = await Pokedex.fetchTypes();
         const chart = TypeChart.create(types);
-        console.log(types);
-        console.log(chart.get('water').defending.grass);
-        const starters = new PlayerSelection(pokedex, types);
+        const starters = new PlayerSelection(pokedex, types, chart);
         starters.renderButtons();
     }
 
