@@ -214,9 +214,60 @@ class Battle {
         const attacking = playerType;
         const defending = opponentType;
         const typeChart = chart;
-        if (!attacking.type2) {
-            const result = typeChart.get(attacking.type1).defending[`${defending.type1}`];
-            console.log(result);
+        const multiplierFirstType = this.getMultiplier(attacking.type1, defending, typeChart);
+        console.log(multiplierFirstType);
+        const resultFirstType = this.getResult(multiplierFirstType);
+        if (attacking.type2) {
+            const multiplierSecondType = this.getMultiplier(attacking.type2, defending, typeChart);
+            const resultSecondType = this.getResult(multiplierSecondType);
+            console.log(resultFirstType, resultSecondType);
+        }
+        console.log(resultFirstType);
+    }
+
+    getResult(multiplier) {
+        let result;
+        switch(multiplier) {
+            case 4:
+                result = 'Critically Effective';
+                break
+            case 2:
+                result = 'Super Effective';
+                break;
+            case 1:
+                result = 'Effective';
+                break;
+            case 0.5:
+                result = 'Not Very Effective';
+                break;
+            case 0.25:
+                result = 'Not Effective';
+                break;
+            case 0:
+                result = 'No Effect';
+                break;
+        }
+        return result;
+    }
+
+    getMultiplier(attackingType, defending, chart) {
+        if (defending.type2) {
+            let multiplier1 = chart.get(attackingType).defending[`${defending.type1}`];
+            let multiplier2 = chart.get(attackingType).defending[`${defending.type2}`];
+            const multiplier = [multiplier1, multiplier2];
+            for (let i = 0; i < multiplier.length; i++) {
+                if (!multiplier[i]) {
+                    multiplier[i] = 1;
+                }
+            }
+            const result = multiplier[0] * multiplier[1];
+            return result;
+        } else {
+            let result = chart.get(attackingType).defending[`${defending.type1}`];
+            if (!result) {
+                result = 1;
+            }
+            return result;
         }
     }
 
