@@ -120,10 +120,10 @@ class Encounter {
 
     render(wildPokemon) {
         console.log(wildPokemon);
-        console.log(wildPokemon.imgURL);
+        console.log(wildPokemon.frontSprite);
         const wildPokemonField = document.getElementById('wild-pokemon');
         this.wildPokemonImg = document.createElement('img');
-        this.wildPokemonImg.src = wildPokemon.imgURL;
+        this.wildPokemonImg.src = wildPokemon.frontSprite;
         wildPokemonField.appendChild(this.wildPokemonImg);
     }
 
@@ -168,7 +168,7 @@ class PlayerSelection {
                 button.id = type;
                 button.textContent = member.name.toUpperCase();
                 let buttonImg = document.createElement('img');
-                buttonImg.src = member.imgURL;
+                buttonImg.src = member.frontSprite;
                 parentDiv.appendChild(button);
                 button.appendChild(buttonImg);
             }
@@ -271,27 +271,42 @@ class Battle {
         }
     }
 
+    renderPokeBall() {
+        const parentDiv = document.getElementById('user-pokemon');
+        parentDiv.innerHTML = '';
+        const container = document.createElement('div');
+        container.id = 'container';
+        const pokeBallImg = document.createElement('img')
+        pokeBallImg.src = 'assets/poke-ball.png';
+        container.append(pokeBallImg);
+        parentDiv.append(container);
+        return pokeBallImg;
+    }
+
     renderPlayerPokemon() {
         const parentDiv = document.getElementById('user-pokemon');
         parentDiv.innerHTML = '';
         const img = document.createElement('img');
-        img.src = this.pokemonObj.imgURL;
+        img.src = this.pokemonObj.backSprite;
+        img.id = 'user-pokemon-img'
         parentDiv.appendChild(img);
     }
 
     clickHandler(id) {
+        const animated = this.renderPokeBall();
+        animated.addEventListener('animationend', this.renderPlayerPokemon.bind(this))
         let type = this.getPlayerType(this.playerParty, id);
-        this.renderPlayerPokemon();
         this.battleResult(type, this.opponentType, this.typeChart);
 
     }
 }
 
 class Entry {
-    constructor(id, name, imgURL, type) {
+    constructor(id, name, frontSprite, backSprite, type) {
         this.id = id;
         this.name = name;
-        this.imgURL = imgURL;
+        this.frontSprite = frontSprite;
+        this.backSprite = backSprite;
         this.type = type;
     }
 }
@@ -345,6 +360,7 @@ class Pokedex {
                 data.id,
                 data.name,
                 data.sprites.front_default,
+                data.sprites.back_default,
                 data.types
             );
             Pokedex.entries.push(entry);

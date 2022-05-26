@@ -50,13 +50,14 @@ body {
     grid-template-columns: 1fr 1fr;
 }
 
-#wild-pokemon {
-    background-color: rgba(240, 248, 255, 0.226);
-    min-height: 100%;
-}
 
-#user-pokemon {
-    background-color: rgba(18, 143, 252, 0.247);
+#user-pokemon-img {
+    height: 250px;
+    width: auto;
+    position: relative;
+    top: 240px;
+    left: 130px;
+    animation: appear 1000ms ease-in;
 }
 
 #arena-text {
@@ -73,6 +74,17 @@ body {
     animation: slide-in 2000ms;
 }
 
+#container {
+    position: relative;
+    top: 390px;
+    left: 230px;
+    animation: throw-x 1000ms ease-out;
+}
+
+#container img {
+    animation: throw-y 1200ms ease-in;
+}
+
 @keyframes slide-in {
     from {
         transform: translateX(75%);
@@ -80,5 +92,40 @@ body {
 
     to {
         transform: translateX(0%);
+    }
+}
+
+@keyframes throw-x {
+    0% {
+        transform: translateX(-40%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes throw-y {
+    0% {
+        transform: translateY(-500%);
+    }
+
+    80% {
+        transform: translateY(0%);
+        opacity: 100%
+    }
+
+    100% {
+        opacity: 0%
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0%
+    }
+
+    to {
+        opacity: 100%
     }
 }
