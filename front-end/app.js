@@ -7,12 +7,8 @@ String.prototype.shuffle = function () {
         string[i] = string[j];
         string[j] = temp;
     }
-    console.log(string.join(''));
     return string.join('');
 };
-
-let zubat = 'zubat';
-zubat.shuffle();
 
 class AnimatedText {
     constructor(elementId) {
@@ -97,21 +93,6 @@ class Encounter {
         );
     }
 
-    getWildPokemonType(wildPokemon) {
-        let typeArray = wildPokemon.type;
-        let type;
-        if (typeArray.length === 1) {
-            type = { type1: typeArray[0].type.name, type2: null };
-        } else if (typeArray.length === 2) {
-            type = {
-                type1: typeArray[0].type.name,
-                type2: typeArray[1].type.name,
-            };
-        }
-        console.log(type);
-        return type;
-    }
-
     generateRandomPokemon() {
         const dexNum = Math.floor(Math.random() * 151);
         const pokemon = this.pokedex[dexNum];
@@ -133,8 +114,7 @@ class Encounter {
         }
         const wildPokemon = this.generateRandomPokemon();
         this.render(wildPokemon);
-        const type = this.getWildPokemonType(wildPokemon);
-        let battle = new Battle(type, this.playerParty, this.chart);
+        let battle = new Battle(wildPokemon, this.playerParty, this.chart);
     }
 }
 
@@ -177,21 +157,40 @@ class PlayerSelection {
 }
 
 class Battle {
-    constructor(type, playerParty, chart) {
+    constructor(wildPokemon, playerParty, chart) {
         this.playerParty = playerParty;
-        this.opponentType = type;
+        this.wildPokemon = wildPokemon;
         this.typeChart = chart;
+        this.opponentType = this.getWildPokemonType(wildPokemon);
         console.log(this.typeChart);
         console.log(this.opponentType);
         const oldParentDiv = document.getElementById('pokemon-selection');
         const newParentDiv = oldParentDiv.cloneNode(true);
         oldParentDiv.replaceWith(newParentDiv);
-        newParentDiv.addEventListener('click', event => {
-            if (event.target.tagName === 'BUTTON' || event.target.tagName === 'IMG') {
+        newParentDiv.addEventListener('click', (event) => {
+            if (
+                event.target.tagName === 'BUTTON' ||
+                event.target.tagName === 'IMG'
+            ) {
                 const id = event.target.closest('button').id;
                 this.clickHandler(id);
             }
-        })
+        });
+    }
+
+    getWildPokemonType(wildPokemon) {
+        let typeArray = wildPokemon.type;
+        let type;
+        if (typeArray.length === 1) {
+            type = { type1: typeArray[0].type.name, type2: null };
+        } else if (typeArray.length === 2) {
+            type = {
+                type1: typeArray[0].type.name,
+                type2: typeArray[1].type.name,
+            };
+        }
+        console.log(type);
+        return type;
     }
 
     getPlayerType(pokemon, id) {
@@ -214,23 +213,50 @@ class Battle {
         const attacking = playerType;
         const defending = opponentType;
         const typeChart = chart;
-        const multiplierFirstType = this.getMultiplier(attacking.type1, defending, typeChart);
+        const multiplierFirstType = this.getMultiplier(
+            attacking.type1,
+            defending,
+            typeChart
+        );
         console.log(multiplierFirstType);
         const resultFirstType = this.getResult(multiplierFirstType);
+        let resultSecondType;
         if (attacking.type2) {
-            const multiplierSecondType = this.getMultiplier(attacking.type2, defending, typeChart);
-            const resultSecondType = this.getResult(multiplierSecondType);
+            const multiplierSecondType = this.getMultiplier(
+                attacking.type2,
+                defending,
+                typeChart
+            );
+            resultSecondType = this.getResult(multiplierSecondType);
             console.log(resultFirstType, resultSecondType);
         }
-        console.log(resultFirstType);
+        if (
+            resultFirstType === 'Super Effective' ||
+            resultSecondType === 'Super Effective'
+        ) {
+            const result = 'WIN';
+            return result;
+        } else if (resultFirstType === 'Effective' && !resultSecondType) {
+            const result = 'DRAW';
+            return result;
+        } else if (
+            resultFirstType === 'Effective' &&
+            resultSecondType === 'Effective'
+        ) {
+            const result = 'DRAW';
+            return result;
+        } else {
+            const result = 'LOSE';
+            return result;
+        }
     }
 
     getResult(multiplier) {
         let result;
-        switch(multiplier) {
+        switch (multiplier) {
             case 4:
-                result = 'Critically Effective';
-                break
+                result = 'Super Effective';
+                break;
             case 2:
                 result = 'Super Effective';
                 break;
@@ -241,7 +267,7 @@ class Battle {
                 result = 'Not Very Effective';
                 break;
             case 0.25:
-                result = 'Not Effective';
+                result = 'Not Very Effective';
                 break;
             case 0:
                 result = 'No Effect';
@@ -252,8 +278,10 @@ class Battle {
 
     getMultiplier(attackingType, defending, chart) {
         if (defending.type2) {
-            let multiplier1 = chart.get(attackingType).defending[`${defending.type1}`];
-            let multiplier2 = chart.get(attackingType).defending[`${defending.type2}`];
+            let multiplier1 =
+                chart.get(attackingType).defending[`${defending.type1}`];
+            let multiplier2 =
+                chart.get(attackingType).defending[`${defending.type2}`];
             const multiplier = [multiplier1, multiplier2];
             for (let i = 0; i < multiplier.length; i++) {
                 if (!multiplier[i]) {
@@ -263,7 +291,8 @@ class Battle {
             const result = multiplier[0] * multiplier[1];
             return result;
         } else {
-            let result = chart.get(attackingType).defending[`${defending.type1}`];
+            let result =
+                chart.get(attackingType).defending[`${defending.type1}`];
             if (!result) {
                 result = 1;
             }
@@ -276,7 +305,7 @@ class Battle {
         parentDiv.innerHTML = '';
         const container = document.createElement('div');
         container.id = 'container';
-        const pokeBallImg = document.createElement('img')
+        const pokeBallImg = document.createElement('img');
         pokeBallImg.src = 'assets/poke-ball.png';
         container.append(pokeBallImg);
         parentDiv.append(container);
@@ -288,16 +317,36 @@ class Battle {
         parentDiv.innerHTML = '';
         const img = document.createElement('img');
         img.src = this.pokemonObj.backSprite;
-        img.id = 'user-pokemon-img'
+        img.id = 'user-pokemon-img';
         parentDiv.appendChild(img);
+        return img;
     }
 
     clickHandler(id) {
-        const animated = this.renderPokeBall();
-        animated.addEventListener('animationend', this.renderPlayerPokemon.bind(this))
-        let type = this.getPlayerType(this.playerParty, id);
-        this.battleResult(type, this.opponentType, this.typeChart);
-
+        const animatedBall = this.renderPokeBall();
+        animatedBall.addEventListener('animationend', (event) => {
+            let type = this.getPlayerType(this.playerParty, id);
+            const animatedMon = this.renderPlayerPokemon();
+            animatedMon.addEventListener('animationend', (event) => {
+                const result = this.battleResult(
+                    type,
+                    this.opponentType,
+                    this.typeChart
+                );
+                if (result === 'WIN') {
+                    let response = prompt(
+                        `You have defeated "${this.wildPokemon.name.shuffle()}." Unscramble the name to capture this Pokemon`
+                    ).toLowerCase();
+                    if (response === this.wildPokemon.name) {
+                        console.log(
+                            `You have captured ${this.wildPokemon.name}`
+                        );
+                    } else {
+                        console.log('You did not name this Pokemon correctly.')
+                    }
+                }
+            });
+        });
     }
 }
 
